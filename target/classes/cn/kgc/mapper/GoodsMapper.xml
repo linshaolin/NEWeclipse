@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.kgc.mapper.GoodsMapper">
+	
+	<resultMap type="Goods" id="GoodsBaseMap">
+		<id property="id" column="id"/>
+		<result property="goodsSN" column="goodsSN"/>
+		<result property="goodsName" column="goodsName"/>
+		<result property="goodsFormat" column="goodsFormat"/>
+		<result property="marketPrice" column="marketPrice"/>
+		<result property="realPrice" column="realPrice"/>
+		<result property="state" column="state"/>
+		<result property="note" column="note"/>
+		<result property="goodsNum" column="goodsNum"/>
+		<result property="unit" column="unit"/>
+		<result property="createTime" column="createTime"/>
+		<result property="lastUpdateTime" column="lastUpdateTime"/>
+		<result property="createdBy" column="createdBy"/>
+	</resultMap>
+	
+	<!-- 获取商品集合，根据最后更新时间降序分页显示 -->
+	<select id="getGoosList" resultType="Goods" parameterType="Goods">
+		SELECT * FROM goods_info 
+			<where>
+				<if test="goodsName != null">and goodsName like CONCAT('%',#{goodsName},'%')</if>
+				<if test="state != null">and state like CONCAT('%',#{state},'%')</if>
+			</where>
+		order by lastUpdateTime desc limit #{starNum},#{pageSize}
+	</select>
+	
+	<!-- 获取商品集合，不分页 -->
+	<select id="getGoosListNoFenYe" resultType="Goods" parameterType="Goods">
+		SELECT * FROM goods_info 
+			<where>
+				<if test="goodsName != null">and goodsName like CONCAT('%',#{goodsName},'%')</if>
+				<if test="state != null">and state like CONCAT('%',#{state},'%')</if>
+			</where>
+	</select>
+	
+	<!-- 根据id获取商品 -->
+	<select id="getGoodsById" resultType="Goods" parameterType="Goods">
+		select * from goods_info where id = #{id}
+	</select>
+	
+	<!-- 获取商品数量 -->
+	<select id="count" parameterType="Goods" resultType="int">
+		select count(1) from goods_info
+		<where>
+			<if test="goodsName != null">and goodsName like CONCAT('%',#{goodsName},'%')</if>
+			<if test="state != null">and state like CONCAT('%',#{state},'%')</if>
+			<if test="id != null">and id = #{id }</if>
+			<if test="goodsSN != null">and goodsSN = #{goodsSN }</if>
+		</where>
+	</select>
+	
+	<!-- 添加商品 -->
+	<insert id="addGoods" parameterType="Goods">
+		insert into goods_info (goodsSN,goodsName,goodsFormat,marketPrice,realPrice,state,note,goodsNum,unit,createTime,lastUpdateTime,createdBy) 
+						values (#{goodsSN},#{goodsName},#{goodsFormat},#{marketPrice},#{realPrice},#{state},#{note},#{goodsNum},#{unit},#{createTime},#{lastUpdateTime},#{createdBy})
+	</insert>
+	
+	<!-- 修改商品 -->
+	<update id="updateGoods" parameterType="Goods">
+		update goods_info
+			<set>
+				<if test="goodsSN != null"> goodsSN = #{goodsSN},</if>
+				 <if test="goodsName != null"> goodsName = #{goodsName},</if>
+				 <if test="goodsFormat != null"> goodsFormat = #{goodsFormat},</if>
+				 <if test="marketPrice != null"> marketPrice = #{marketPrice},</if>
+				 <if test="realPrice != null"> realPrice = #{realPrice},</if>
+				 <if test="state != null"> state = #{state},</if>
+				 <if test="note != null"> note = #{note},</if>
+				 <if test="goodsNum != null"> goodsNum = #{goodsNum},</if>
+				 <if test="unit != null"> unit = #{unit},</if>
+				 <if test="createTime != null"> createTime = #{createTime},</if>
+				 <if test="lastUpdateTime != null"> lastUpdateTime = #{lastUpdateTime},</if>
+				 <if test="createdBy != null"> createdBy = #{createdBy}</if>
+		     </set>
+			where id = #{id}
+	</update>
+	
+	<!-- 删除商品 -->
+	<delete id="deleteGoods" parameterType="Goods">
+		delete from goods_info where id=#{id}
+	</delete>
+	
+	<!-- 根据id查看当前商品是否在套餐内 -->
+	<select id="isgoodspack" parameterType="Goods" resultType="int">
+		SELECT COUNT(1) FROM goods_pack_affiliated WHERE goodsInfoId = #{id}
+	</select>
+</mapper>

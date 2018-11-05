@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.kgc.mapper.FunctionMapper">
+	
+	<!-- 获取主菜单 -->
+	<select id="getZhuCaiDan" parameterType="QuanXian" resultType="Function">
+		SELECT * FROM au_function WHERE id IN (SELECT functionId FROM au_authority WHERE roleId=#{roleId}) AND parentId=0 
+	</select>
+	
+	<!-- 获取子菜单 -->
+	<select id="getZiCaiDan" parameterType="Function" resultType="Function">
+		SELECT * FROM au_function WHERE id IN (SELECT functionId FROM au_authority WHERE roleId = #{roleId}) AND parentId = #{id} 
+	</select>
+	
+	<!-- 获取主菜单 -->
+	<select id="getZhuFuncList" resultType="Function">
+		select * from au_function where parentId  = #{id}
+	</select>
+	
+	<!-- 根据角色id获取功能集合 -->
+	<select id="getFunctionListByRoId" resultType="Function" parameterType="QuanXian">
+		select * from au_function where id in(select functionid from au_authority where roleId = ${roleId}) and parentId > 0
+	</select>
+	
+	<!-- 查询当前角色所拥有的所有功能列表 -->
+	<select id="getFunctionListByIn" resultType="function" parameterType="String">
+		select * from au_function where id in(${sqlInString}) or parentId in(select id from au_function where id in(${sqlInString}) and parentId > 0) or parentId = 999
+	</select>
+</mapper>
